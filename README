@@ -1,0 +1,15 @@
+The purpose of this is to add enableDrawing, enableEditing, and disableEditing to a GMap API v3
+	Polyline and Polygon.  Right now it is only applied to a Polyline.  To use this,
+	instead of doing "new google.maps.Polyline", do "new google.mapsextensions.Polyline" with the
+	same interface.  The new polyline has enableDrawing, enableEditing, and disableEditing with the
+	same options as v2 of the API.
+
+This release makes use of the Latitude/longitude spherical geodesy formulae & scripts written by
+Chris Veness.  His page and notes can be found at: http://www.movable-type.co.uk/scripts/latlong.html 
+
+Example of how to use this can be found in html/test.html.
+
+Online example can be found at: http://www.shanetomlinson.com/static/gmapV3EditablePolys/html/test.html
+
+Released under the Creative Commons Attribution 3.0 Unported license
+http://creativecommons.org/licenses/by-sa/3.0/
