@@ -90,6 +90,10 @@ __extend( google.mapsextensions.Polyline.prototype, {
 		this.addPointFromPolyline = false;
 	},
 	
+	onLineUpdated: function( event ) {
+		google.maps.event.trigger( this, 'lineupdated' );
+	},
+	
 	addPoint: function( latLng, index ) {
 		var path = this.getPath();
 		if( path.length < this.drawingOpts.maxVerticies ) {
@@ -102,6 +106,7 @@ __extend( google.mapsextensions.Polyline.prototype, {
 			path: this.getPath(),
 			map: this.getMap()
 		} );
+		google.maps.event.addListener( this.pathWithMarkers, 'lineupdated', __bind( this.onLineUpdated, this ) );
 	},
 	
 	setPolylineEditable: function( editable ) {
@@ -159,6 +164,7 @@ __extend( google.mapsextensions.PathWithMarkers.prototype, {
 
 		var marker = this.createMarker( index, latLng );
 		this.markerCollection.addMarker( marker, index );
+		google.maps.event.trigger( this, 'lineupdated' );
 	},
 	
 	createMarker: function( index, latLng ) {
@@ -180,6 +186,7 @@ __extend( google.mapsextensions.PathWithMarkers.prototype, {
 		var index = this.markerCollection.getIndex( marker );
 		if( index > -1 ) {
 			this.path.setAt( index, marker.getPosition() );
+			google.maps.event.trigger( this, 'lineupdated' );
 		}
 	},
 	
