@@ -6,7 +6,7 @@
 * @param {object} opts - configuration options.
 */
 google.mapsextensions.PointMarker = function( opts ) {
-	__extend(this, opts);
+	extend(this, opts);
 	
 	this.target = null;
 	
@@ -14,7 +14,7 @@ google.mapsextensions.PointMarker = function( opts ) {
 }
 google.mapsextensions.PointMarker.prototype = new google.maps.OverlayView();
 
-__extend( google.mapsextensions.PointMarker.prototype, {
+extend( google.mapsextensions.PointMarker.prototype, {
 	onAdd: function() {
 		var div = document.createElement( 'DIV' );
 		
@@ -35,10 +35,10 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 		var panes = this.getPanes();
 		panes.overlayLayer.appendChild( div );
 		
-		$( div ).bind( 'mousedown', __bind( this.onMouseDown, this ) )
-				.bind( 'mouseup', __bind( this.onMouseUp, this ) )
-				.bind( 'mousemove', __bind( this.onMouseMove, this ) )
-				.bind( 'click', __bind( this.onClick, this ) );
+		$( div ).bind( 'mousedown', bind( this.onMouseDown, this ) )
+				.bind( 'mouseup', bind( this.onMouseUp, this ) )
+				.bind( 'mousemove', bind( this.onMouseMove, this ) )
+				.bind( 'click', bind( this.onClick, this ) );
 	},
 	
 	draw: function() {
@@ -68,10 +68,10 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 		if( this.draggable ) {
 			google.maps.event.trigger( this, 'dragstart', latLng );	
 			
-			this.mouseMoveOverMapListner = __bind( this.onMouseMoveOverMap, this );
+			this.mouseMoveOverMapListner = bind( this.onMouseMoveOverMap, this );
 			$( this.getMap().getDiv() ).bind( 'mousemove', this.mouseMoveOverMapListner );
 			
-			this.mouseUpOverMapListner = __bind( this.onMouseUpOverMap, this );
+			this.mouseUpOverMapListner = bind( this.onMouseUpOverMap, this );
 			$( this.getMap().getDiv() ).bind( 'mouseup', this.mouseUpOverMapListner );
 
 			this.dragging = true;

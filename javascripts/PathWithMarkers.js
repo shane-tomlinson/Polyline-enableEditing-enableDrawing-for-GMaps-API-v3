@@ -15,12 +15,12 @@
 * @type {object} (optional)
 */
 google.mapsextensions.PathWithMarkers = function( opts ) {
-	__extend(this, opts);
+	extend(this, opts);
 	
 	this.initMarkerCollection();
 };
 
-__extend( google.mapsextensions.PathWithMarkers.prototype, {
+extend( google.mapsextensions.PathWithMarkers.prototype, {
 	initMarkerCollection: function() {
 		if( !this.markerCollection ) {
 			this.markerCollection = new google.mapsextensions.MarkersCollection();
@@ -39,11 +39,11 @@ __extend( google.mapsextensions.PathWithMarkers.prototype, {
 		var marker = this.createMarker( index, latLng );
 		this.markerCollection.addMarker( marker, index );
 
-		google.maps.event.addListener( marker, 'dragend', __bind( function( latLng ) {
+		google.maps.event.addListener( marker, 'dragend', bind( function( latLng ) {
 			this.onMarkerDragEnd( marker );
 		}, this ) );
 		
-		google.maps.event.addListener( marker, 'click', __bind( function( latLng ) {
+		google.maps.event.addListener( marker, 'click', bind( function( latLng ) {
 			this.onMarkerClick( marker );
 		}, this ) );
 		

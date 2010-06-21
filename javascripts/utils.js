@@ -6,13 +6,13 @@
 *	same options as v2 of the API.
 */
 
-function __extend(addTo, extension) {
+function extend(addTo, extension) {
 	for( var key in extension ) {
 		addTo[ key ] = extension[ key ];
 	}
 }
 
-function __bind( func, context ) {
+function bind( func, context ) {
 	return function() {
 		return func.apply( context, arguments );
 	};

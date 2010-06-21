@@ -15,10 +15,10 @@
 * @type {LatLng} 
 */
 google.mapsextensions.Segment = function( opts ) {
-	__extend(this, opts);
+	extend(this, opts);
 }
 
-__extend( google.mapsextensions.Segment.prototype, {
+extend( google.mapsextensions.Segment.prototype, {
 	/**
 	* Check if the segment contains a point
 	* @method containsPoint

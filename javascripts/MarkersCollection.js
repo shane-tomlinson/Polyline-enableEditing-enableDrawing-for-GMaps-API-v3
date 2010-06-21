@@ -9,7 +9,7 @@ google.mapsextensions.MarkersCollection = function( opts ) {
 	google.maps.MVCArray.apply( this, arguments );
 }
 google.mapsextensions.MarkersCollection.prototype = new google.maps.MVCArray();
-__extend( google.mapsextensions.MarkersCollection.prototype, {
+extend( google.mapsextensions.MarkersCollection.prototype, {
 	getIndex: function( marker ) {
 		for ( var index = 0, len = this.getLength(); index < len; ++index ) {
 			if( this.getAt( index ) == marker ) {

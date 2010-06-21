@@ -12,7 +12,7 @@ google.mapsextensions.Polyline = function() {
 };
 google.mapsextensions.Polyline.prototype = new google.maps.Polyline();
 
-__extend( google.mapsextensions.Polyline.prototype, {
+extend( google.mapsextensions.Polyline.prototype, {
 	enableDrawing: function( opts ) {
 		// maxVertices, fromStart
 		opts = opts || {},
@@ -20,14 +20,14 @@ __extend( google.mapsextensions.Polyline.prototype, {
 		opts.maxVerticies = 'number' == typeof ( opts.maxVertices ) ? opts.maxVerticies : Infinity;
 		this.drawingOpts = opts;
 		
-		this.mapClickHandler = google.maps.event.addListener( this.getMap(), 'click', __bind( this.onMapClick, this ) );
+		this.mapClickHandler = google.maps.event.addListener( this.getMap(), 'click', bind( this.onMapClick, this ) );
 	},
 	
 	enableEditing: function( opts ) {
 		this.pathWithMarkers.setEditable( true );
 		this.setPolylineEditable( true );
 		
-		this.polylineMouseDownHandler = google.maps.event.addListener( this, 'mousedown', __bind( this.onPolylineMouseDown, this ) );
+		this.polylineMouseDownHandler = google.maps.event.addListener( this, 'mousedown', bind( this.onPolylineMouseDown, this ) );
 	},
 
 	disableEditing: function( opts ) {
@@ -83,7 +83,7 @@ __extend( google.mapsextensions.Polyline.prototype, {
 			path: this.getPath(),
 			map: this.getMap()
 		} );
-		google.maps.event.addListener( this.pathWithMarkers, 'lineupdated', __bind( this.onLineUpdated, this ) );
+		google.maps.event.addListener( this.pathWithMarkers, 'lineupdated', bind( this.onLineUpdated, this ) );
 	},
 	
 	setPolylineEditable: function( editable ) {
