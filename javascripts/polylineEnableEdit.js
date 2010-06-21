@@ -140,8 +140,7 @@ __extend( google.mapsextensions.Polyline.prototype, {
 * @type {object} (optional)
 */
 google.mapsextensions.PathWithMarkers = function( opts ) {
-	this.path = opts.path;
-	this.map = opts.map;
+	__extend(this, opts);
 	
 	this.initMarkerCollection();
 };
@@ -326,8 +325,7 @@ __extend( google.mapsextensions.MarkersCollection.prototype, {
 * @type {LatLng} 
 */
 google.mapsextensions.Segment = function( opts ) {
-	this.startPoint = opts.startPoint;
-	this.endPoint = opts.endPoint;
+	__extend(this, opts);
 }
 
 __extend( google.mapsextensions.Segment.prototype, {
@@ -361,15 +359,7 @@ __extend( google.mapsextensions.Segment.prototype, {
 * @param {object} opts - configuration options.
 */
 google.mapsextensions.PointMarker = function( opts ) {
-	this.map = opts.map;
-	this.color = opts.color;
-	this.position = opts.position;
-	this.dragEnabled = opts.draggable;
-	
-	this.visible = true;
-	if ("visible" in opts) {
-		this.visible = opts.visible;
-	}
+	__extend(this, opts);
 	
 	this.target = null;
 	
@@ -428,7 +418,7 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 		var latLng = this.getEventLatLng( event );
 		google.maps.event.trigger( this, 'mousedown', latLng );	
 		
-		if( this.dragEnabled ) {
+		if( this.draggable ) {
 			google.maps.event.trigger( this, 'dragstart', latLng );	
 			
 			this.mouseMoveOverMapListner = __bind( this.onMouseMoveOverMap, this );
@@ -457,7 +447,7 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 	},
 
 	onMouseUpOverMap: function( event ) {
-		if( this.dragEnabled && this.dragging ) {
+		if( this.draggable && this.dragging ) {
 			var latLng = this.getEventLatLng( event );
 			google.maps.event.trigger( this, 'dragend', latLng );
 			
@@ -472,7 +462,7 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 	},
 	
 	onMouseMoveOverMap: function( event ) {
-		if( this.dragEnabled && this.dragging ) {
+		if( this.draggable && this.dragging ) {
 			var latLng = this.getEventLatLng( event );
 
 			this.setPosition( latLng );
@@ -482,7 +472,7 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 	
 	
 	setDraggable: function( draggable ) {
-		this.dragEnabled = !!draggable;
+		this.draggable = !!draggable;
 	},
 	
 	setVisible: function( visible ) {
