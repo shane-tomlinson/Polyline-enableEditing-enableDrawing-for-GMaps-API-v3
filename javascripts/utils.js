@@ -13,11 +13,9 @@ function __extend(addTo, extension) {
 }
 
 function __bind( func, context ) {
-	var call = func, context = context;
 	return function() {
-		return call.apply( context, arguments );
-	}
-
+		return func.apply( context, arguments );
+	};
 }
 
 google.mapsextensions = {};
