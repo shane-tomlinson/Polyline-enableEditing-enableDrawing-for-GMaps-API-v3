@@ -164,20 +164,23 @@ __extend( google.mapsextensions.PathWithMarkers.prototype, {
 
 		var marker = this.createMarker( index, latLng );
 		this.markerCollection.addMarker( marker, index );
+
+		google.maps.event.addListener( marker, 'dragend', __bind( function( event ) {
+			this.onMarkerDragEnd( marker );
+		}, this ) );
+		
+		
 		google.maps.event.trigger( this, 'lineupdated' );
 	},
 	
 	createMarker: function( index, latLng ) {
-		var marker = new google.maps.Marker( {
+		var marker = new google.mapsextensions.PointMarker( {
 			position: latLng,
 			map: this.map,
-			path: this.path,
+			color: '#ff0000',
+			/*path: this.path,*/
 			draggable: !!this.editingEnabled
 		} );
-		
-		google.maps.event.addListener( marker, 'dragend', __bind( function( event ) {
-			this.onMarkerDragEnd( marker );
-		}, this ) );
 		
 		return marker;
 	},
@@ -333,3 +336,91 @@ __extend( google.mapsextensions.Segment.prototype, {
 		return ( ( ( bearingToEnd - 2 ) < bearingToPoint ) && ( bearingToPoint <  ( bearingToEnd + 2 ) ) && ( distanceToPoint <= distanceToEnd ) );
 	}
 } )
+
+
+/**
+* An marker marking a point on the map
+* @class google.mapsextensions.PointMarker
+* @extends google.maps.OverlayView
+* @constructor 
+* @param {object} opts - configuration options.
+*/
+google.mapsextensions.PointMarker = function( opts ) {
+	this.map = opts.map;
+	this.color = opts.color;
+	this.position = opts.position;
+	
+	this.target = null;
+	
+	this.setMap( this.map );
+}
+google.mapsextensions.PointMarker.prototype = new google.maps.OverlayView();
+
+__extend( google.mapsextensions.PointMarker.prototype, {
+	onAdd: function() {
+		var div = document.createElement( 'DIV' );
+		
+		$( div ).css( {
+			border: '1px solid ' + this.color,
+			position: 'absolute',
+			'background-color': '#ffffff',
+			'width': '9px',
+			'height': '9px',
+			'z-index': 1
+		} );
+		
+		
+		this.target = div;
+		
+		var panes = this.getPanes();
+		panes.overlayLayer.appendChild( div );
+		
+		$( div ).bind( 'mousedown', __bind( this.onMouseDown, this ) )
+				.bind( 'mouseup', __bind( this.onMouseUp, this ) )
+				.bind( 'mousemove', __bind( this.onMouseMove, this ) )
+				.bind( 'click', __bind( this.onDOMEvent, this ) );
+	},
+	
+	draw: function() {
+		var overlayProjection = this.getProjection();
+		
+		var center = this.position;
+		var div = this.target;
+		
+		var centerPos = overlayProjection.fromLatLngToDivPixel( center );
+		
+		div.style.left = ( centerPos.x - 5 ) + 'px';
+		div.style.top = ( centerPos.y - 5 ) + 'px';
+	},
+	
+	onRemove: function() {
+		this.target.parentNode.removeChild( this.target );
+		this.target = null;
+	},
+	
+	onMouseDown: function( event ) {
+		google.maps.event.trigger( this, 'mousedown' );	
+	},
+	
+	onMouseUp: function( event ) {
+		google.maps.event.trigger( this, 'mouseup' );	
+	},
+	
+	onMouseMove: function( event ) {
+	
+	},
+	
+	onDOMEvent: function( event ) {
+		google.maps.event.trigger( this, event.type );
+		console.log( 'event type: ' +  event.type );
+	},
+	
+	setDraggable: function() {
+	
+	},
+	
+	getPosition: function() {
+		
+	}
+	
+} );
