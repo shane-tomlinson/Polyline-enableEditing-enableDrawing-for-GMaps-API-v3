@@ -182,6 +182,7 @@ __extend( google.mapsextensions.PathWithMarkers.prototype, {
 			map: this.map,
 			color: '#ff0000',
 			/*path: this.path,*/
+			visible: !!this.editingEnabled,
 			draggable: !!this.editingEnabled
 		} );
 		
@@ -303,6 +304,7 @@ __extend( google.mapsextensions.MarkersCollection.prototype, {
 	setEditable: function( editable ) {
 		for( var index = 0, marker; marker = this.getAt( index ); ++index ) {
 			marker.setDraggable( !!editable );
+			marker.setVisible( !!editable );
 		}
 	}
 } );
@@ -364,6 +366,11 @@ google.mapsextensions.PointMarker = function( opts ) {
 	this.position = opts.position;
 	this.dragEnabled = opts.draggable;
 	
+	this.visible = true;
+	if ("visible" in opts) {
+		this.visible = opts.visible;
+	}
+	
 	this.target = null;
 	
 	this.setMap( this.map );
@@ -376,6 +383,7 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 		
 		$( div ).css( {
 			border: '1px solid ' + this.color,
+			display: this.visible ? 'block' : 'none',
 			position: 'absolute',
 			'background-color': '#ffffff',
 			'width': '9px',
@@ -475,6 +483,11 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 	
 	setDraggable: function( draggable ) {
 		this.dragEnabled = !!draggable;
+	},
+	
+	setVisible: function( visible ) {
+		this.visible = !!visible;
+		$(this.target)[visible ? "show" : "hide"]();
 	},
 	
 	getPosition: function() {
