@@ -105,11 +105,7 @@ extend( google.mapsextensions.Polyline.prototype, {
 	},
 	
 	setPolyEditOptions: function( opts ) {
-		var opts = opts || {};
-		
-		for( var key in opts ) {
-			this.drawingOpts[ key ] = opts[ key ];
-		}
+		extend(this.drawingOpts, opts || {});
 	},
 	
 	setOptions: function( opts ) {
