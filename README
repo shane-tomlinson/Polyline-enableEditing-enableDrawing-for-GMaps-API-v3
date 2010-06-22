@@ -17,3 +17,4 @@ Online demo can be found at: http://www.shanetomlinson.com/static/gmapV3Editable
 TODO:
 * Fix up the Drag/Drop of markers to make more reliable
 * remove marker dependency on jQuery
+* Make markers only appear when enableEditing is called and when mousing over the Polyline
