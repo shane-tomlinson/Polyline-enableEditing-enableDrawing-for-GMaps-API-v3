@@ -15,6 +15,7 @@
 			<li>To add new points to the line or to move points, click Enable Editing</li>
 			<li>To disable both modification of the line and points, click Disable Editing</li>
 			<li>To drag a marker, mouse over the marker, press the mouse button down, move the mouse around, let go of the button.</li>
+			<li>To change the color of the lines/markers, enter the hex value of the color of the form "#abcdef" into the input box and press the Change Color button.</li>
 		</ol>
 	</ul>
 
@@ -22,7 +23,13 @@
 	<a href="#" id="btnEnableEditing">Enable Editing</a>
 	<a href="#" id="btnDisableEditing">Disable Editing</a>
 
+	<div style="margin-top: 10px; padding: 10px;">
+		<label for="color">Color:<label><input type="text" id="color" value="#0000ff"/>
+		<a href="#" id="btnSetColor">Change Color</a>
+	</div>
+	
 	<script type="text/javascript">
+		  var initialColor = '#0000ff';
 		  var poly;
 		  var map;
 
@@ -38,8 +45,8 @@
 			var path = new google.maps.MVCArray();
 
 			var polyOptions = {
-			  strokeColor: '#000000',
-			  strokeOpacity: 1.0,
+			  strokeColor: initialColor,
+			  strokeOpacity: 0.6,
 			  strokeWeight: 3,
 			  clickable: true,
 			  geodesic: false,
@@ -69,6 +76,15 @@
 			event.preventDefault();
 
 			poly.disableEditing();
+		} );
+		
+		$( '#color' ).val( initialColor );
+		$( '#btnSetColor' ).bind( 'click', function( event ) {
+			event.preventDefault();
+			
+			poly.setOptions( {
+				strokeColor: $( '#color' ).val()
+			} );
 		} );
 	</script>
 	<script type="text/javascript">

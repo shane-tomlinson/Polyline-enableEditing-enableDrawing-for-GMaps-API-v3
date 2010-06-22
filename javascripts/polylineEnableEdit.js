@@ -28,7 +28,9 @@ google.mapsextensions = {};
 * @extends google.maps.Polyline
 * @constructor
 */
-google.mapsextensions.Polyline = function() {
+google.mapsextensions.Polyline = function( opts ) {
+	this.color = opts.strokeColor;
+	
 	google.maps.Polyline.apply( this, arguments );
 
 	this.initPathWithMarkers();
@@ -37,7 +39,6 @@ google.mapsextensions.Polyline.prototype = new google.maps.Polyline();
 
 __extend( google.mapsextensions.Polyline.prototype, {
 	enableDrawing: function( opts ) {
-		// maxVertices, fromStart
 		opts = opts || {},
 		opts.fromStart = opts.fromStart || false;
 		opts.maxVerticies = 'number' == typeof ( opts.maxVertices ) ? opts.maxVerticies : Infinity;
@@ -104,7 +105,8 @@ __extend( google.mapsextensions.Polyline.prototype, {
 	initPathWithMarkers: function() {
 		this.pathWithMarkers = new google.mapsextensions.PathWithMarkers( {
 			path: this.getPath(),
-			map: this.getMap()
+			map: this.getMap(),
+			color: this.color
 		} );
 		google.maps.event.addListener( this.pathWithMarkers, 'lineupdated', __bind( this.onLineUpdated, this ) );
 	},
@@ -119,6 +121,16 @@ __extend( google.mapsextensions.Polyline.prototype, {
 		this.pathWithMarkers.setMap( map );
 		
 		google.maps.Polyline.prototype.setMap.apply( this, arguments );
+	},
+	
+	setOptions: function( opts ) {
+		if( opts.strokeColor ) {
+			this.pathWithMarkers.setOptions( {
+				color: opts.strokeColor
+			} );
+		}
+		
+		google.maps.Polyline.prototype.setOptions.apply( this, arguments );
 	}
 
 } );
@@ -139,9 +151,15 @@ __extend( google.mapsextensions.Polyline.prototype, {
 * @config map
 * @type {object} (optional)
 */
+/**
+* The color of the markers, of the style you would use for CSS.
+* @config color
+* @type {string}
+*/
 google.mapsextensions.PathWithMarkers = function( opts ) {
 	this.path = opts.path;
 	this.map = opts.map;
+	this.color = opts.color;
 	
 	this.initMarkerCollection();
 };
@@ -180,8 +198,7 @@ __extend( google.mapsextensions.PathWithMarkers.prototype, {
 		var marker = new google.mapsextensions.PointMarker( {
 			position: latLng,
 			map: this.map,
-			color: '#ff0000',
-			/*path: this.path,*/
+			color: this.color || '#000000',
 			draggable: !!this.editingEnabled
 		} );
 		
@@ -202,7 +219,6 @@ __extend( google.mapsextensions.PathWithMarkers.prototype, {
 		if( index == 0 && len > 1 ) {
 			this.insertAt( len, marker.getPosition() );
 			google.maps.event.trigger( this, 'endline' );
-		//	this.setEditable( false );
 		}
 	},
 	
@@ -223,6 +239,20 @@ __extend( google.mapsextensions.PathWithMarkers.prototype, {
 	*/
 	setMap: function( map ) {
 		this.map = map;
+	},
+	
+	/**
+	* Set the options
+	* @method setOptions
+	* @param {object} opts - options to set
+	*/
+	setOptions: function( opts ) {
+		if( opts.color ) {
+			this.color = opts.color;
+			this.markerCollection.forEach( function( marker, index ) {
+				marker.setColor( opts.color );
+			} );
+		}
 	},
 	
 	/**
@@ -374,7 +404,8 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 	onAdd: function() {
 		var div = document.createElement( 'DIV' );
 		
-		$( div ).css( {
+		this.target = $( div );
+		this.target.css( {
 			border: '1px solid ' + this.color,
 			position: 'absolute',
 			'background-color': '#ffffff',
@@ -383,17 +414,14 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 			'z-index': 1,
 			'cursor': 'pointer'
 		} );
-		
-		
-		this.target = div;
-		
+				
 		var panes = this.getPanes();
 		panes.overlayLayer.appendChild( div );
 		
-		$( div ).bind( 'mousedown', __bind( this.onMouseDown, this ) )
-				.bind( 'mouseup', __bind( this.onMouseUp, this ) )
-				.bind( 'mousemove', __bind( this.onMouseMove, this ) )
-				.bind( 'click', __bind( this.onClick, this ) );
+		this.target.bind( 'mousedown', __bind( this.onMouseDown, this ) )
+				   .bind( 'mouseup', __bind( this.onMouseUp, this ) )
+				   .bind( 'mousemove', __bind( this.onMouseMove, this ) )
+				   .bind( 'click', __bind( this.onClick, this ) );
 	},
 	
 	draw: function() {
@@ -405,12 +433,14 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 		var overlayProjection = this.getProjection();
 		var centerPos = overlayProjection.fromLatLngToDivPixel( latLng );
 		
-		this.target.style.left = ( centerPos.x - 5 ) + 'px';
-		this.target.style.top = ( centerPos.y - 5 ) + 'px';
+		this.target.css( {
+			left: ( centerPos.x - 5 ) + 'px',
+			top: ( centerPos.y - 5 ) + 'px'
+		} );
 	},
 	
 	onRemove: function() {
-		this.target.parentNode.removeChild( this.target );
+		this.target.remove();
 		this.target = null;
 	},
 	
@@ -498,6 +528,28 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 		
 		var point = new google.maps.Point( x, y );
 		return point;
+	},
+
+	/**
+	* set options on the marker
+	* @method setOptions
+	* @param {object} opts - options to set.  Right now only supports color
+	*/
+	setOptions: function( opts ) {
+		if( opts.color ) {
+			this.setColor( opts.color );
+		}
+	},
+	
+	/**
+	* set the marker color
+	* @method setColor
+	* @param {string} color - new marker color
+	*/
+	setColor: function( color ) {
+		this.target.css( {
+			borderColor: color
+		} );
 	}
 	
 } );
