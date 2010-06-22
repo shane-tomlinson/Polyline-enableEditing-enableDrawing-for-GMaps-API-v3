@@ -20,13 +20,21 @@
 			<li>To start adding points, click Enable Drawing</li>
 			<li>To add new points to the line or to move points, click Enable Editing</li>
 			<li>To disable both modification of the line and points, click Disable Editing</li>
+			<li>To drag a marker, mouse over the marker, press the mouse button down, move the mouse around, let go of the button.</li>
+			<li>To change the color of the lines/markers, enter the hex value of the color of the form "#abcdef" into the input box and press the Change Color button.</li>
 		</ol>
 		<a href="#" id="btnEnableDrawing">Enable Drawing</a>
 		<a href="#" id="btnEnableEditing">Enable Editing</a>
 		<a href="#" id="btnDisableEditing">Disable Editing</a>
 	</div>
 
+	<div style="margin-top: 10px; padding: 10px;">
+		<label for="color">Color:<label><input type="text" id="color" value="#0000ff"/>
+		<a href="#" id="btnSetColor">Change Color</a>
+	</div>
+	
 	<script type="text/javascript">
+		  var initialColor = '#0000ff';
 		  var poly;
 		  var map;
 
@@ -42,8 +50,8 @@
 			var path = new google.maps.MVCArray();
 
 			var polyOptions = {
-			  strokeColor: '#000000',
-			  strokeOpacity: 1.0,
+			  strokeColor: initialColor,
+			  strokeOpacity: 0.6,
 			  strokeWeight: 3,
 			  clickable: true,
 			  geodesic: false,
@@ -74,7 +82,28 @@
 
 			poly.disableEditing();
 		} );
+		
+		$( '#color' ).val( initialColor );
+		$( '#btnSetColor' ).bind( 'click', function( event ) {
+			event.preventDefault();
+			
+			poly.setOptions( {
+				strokeColor: $( '#color' ).val()
+			} );
+		} );
 	</script>
-
+	<script type="text/javascript">
+		if( document.location.host.search( 'shanetomlinson' ) > -1 ) {
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		}
+	</script>
+	<script type="text/javascript">
+		try {
+			var pageTracker = _gat._getTracker("UA-9481964-1");
+			// Cookied already:
+			pageTracker._trackPageview();
+		} catch(err) {}
+599</script> 
 </body>
 </html>

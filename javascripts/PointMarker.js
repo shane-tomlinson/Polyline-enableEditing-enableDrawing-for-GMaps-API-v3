@@ -18,7 +18,8 @@ extend( google.mapsextensions.PointMarker.prototype, {
 	onAdd: function() {
 		var div = document.createElement( 'DIV' );
 		
-		$( div ).css( {
+		this.target = $( div );
+		this.target.css( {
 			border: '1px solid ' + this.color,
 			display: this.visible ? 'block' : 'none',
 			position: 'absolute',
@@ -29,13 +30,10 @@ extend( google.mapsextensions.PointMarker.prototype, {
 			'cursor': 'pointer'
 		} );
 		
-		
-		this.target = div;
-		
 		var panes = this.getPanes();
 		panes.overlayLayer.appendChild( div );
 		
-		$( div ).bind( 'mousedown', bind( this.onMouseDown, this ) )
+		this.target.bind( 'mousedown', bind( this.onMouseDown, this ) )
 				.bind( 'mouseup', bind( this.onMouseUp, this ) )
 				.bind( 'mousemove', bind( this.onMouseMove, this ) )
 				.bind( 'click', bind( this.onClick, this ) );
@@ -50,12 +48,14 @@ extend( google.mapsextensions.PointMarker.prototype, {
 		var overlayProjection = this.getProjection();
 		var centerPos = overlayProjection.fromLatLngToDivPixel( latLng );
 		
-		this.target.style.left = ( centerPos.x - 5 ) + 'px';
-		this.target.style.top = ( centerPos.y - 5 ) + 'px';
+		this.target.css( {
+			left: ( centerPos.x - 5 ) + 'px',
+			top: ( centerPos.y - 5 ) + 'px'
+		} );
 	},
 	
 	onRemove: function() {
-		this.target.parentNode.removeChild( this.target );
+		this.target.remove();
 		this.target = null;
 	},
 	
@@ -124,7 +124,7 @@ extend( google.mapsextensions.PointMarker.prototype, {
 	
 	setVisible: function( visible ) {
 		this.visible = !!visible;
-		$(this.target)[visible ? "show" : "hide"]();
+		this.target[visible ? "show" : "hide"]();
 	},
 	
 	getPosition: function() {
@@ -148,6 +148,28 @@ extend( google.mapsextensions.PointMarker.prototype, {
 		
 		var point = new google.maps.Point( x, y );
 		return point;
+	},
+	
+	/**
+	* set options on the marker
+	* @method setOptions
+	* @param {object} opts - options to set.  Right now only supports color
+	*/
+	setOptions: function( opts ) {
+		if( opts.color ) {
+			this.setColor( opts.color );
+		}
+	},
+	
+	/**
+	* set the marker color
+	* @method setColor
+	* @param {string} color - new marker color
+	*/
+	setColor: function( color ) {
+		this.target.css( {
+			borderColor: color
+		} );
 	}
 	
 } );

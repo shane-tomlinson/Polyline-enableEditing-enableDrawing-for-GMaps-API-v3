@@ -5,7 +5,14 @@
 * @extends google.maps.Polyline
 * @constructor
 */
-google.mapsextensions.Polyline = function() {
+google.mapsextensions.Polyline = function( opts ) {
+	this.color = opts.strokeColor;
+
+	this.drawingOpts = { 
+		fromStart: false,
+		maxVerticies: Infinity
+	};
+	
 	google.maps.Polyline.apply( this, arguments );
 
 	this.initPathWithMarkers();
@@ -14,23 +21,21 @@ google.mapsextensions.Polyline.prototype = new google.maps.Polyline();
 
 extend( google.mapsextensions.Polyline.prototype, {
 	enableDrawing: function( opts ) {
-		// maxVertices, fromStart
-		opts = opts || {},
-		opts.fromStart = opts.fromStart || false;
-		opts.maxVerticies = 'number' == typeof ( opts.maxVertices ) ? opts.maxVerticies : Infinity;
-		this.drawingOpts = opts;
+		this.setPolyEditOptions( opts );
 		
 		this.mapClickHandler = google.maps.event.addListener( this.getMap(), 'click', bind( this.onMapClick, this ) );
 	},
 	
 	enableEditing: function( opts ) {
+		this.setPolyEditOptions( opts );
+		
 		this.pathWithMarkers.setEditable( true );
 		this.setPolylineEditable( true );
 		
 		this.polylineMouseDownHandler = google.maps.event.addListener( this, 'mousedown', bind( this.onPolylineMouseDown, this ) );
 	},
 
-	disableEditing: function( opts ) {
+	disableEditing: function() {
 		this.editingEnabled = false;
 		this.pathWithMarkers.setEditable( false );
 		this.setPolylineEditable( false );
@@ -81,7 +86,8 @@ extend( google.mapsextensions.Polyline.prototype, {
 	initPathWithMarkers: function() {
 		this.pathWithMarkers = new google.mapsextensions.PathWithMarkers( {
 			path: this.getPath(),
-			map: this.getMap()
+			map: this.getMap(),
+			color: this.color
 		} );
 		google.maps.event.addListener( this.pathWithMarkers, 'lineupdated', bind( this.onLineUpdated, this ) );
 	},
@@ -96,7 +102,25 @@ extend( google.mapsextensions.Polyline.prototype, {
 		this.pathWithMarkers.setMap( map );
 		
 		google.maps.Polyline.prototype.setMap.apply( this, arguments );
+	},
+	
+	setPolyEditOptions: function( opts ) {
+		var opts = opts || {};
+		
+		for( var key in opts ) {
+			this.drawingOpts[ key ] = opts[ key ];
+		}
+	},
+	
+	setOptions: function( opts ) {
+		if( opts.strokeColor ) {
+			this.pathWithMarkers.setOptions( {
+				color: opts.strokeColor
+			} );
+		}
+		
+		google.maps.Polyline.prototype.setOptions.apply( this, arguments );
 	}
-
+	
 } );
 

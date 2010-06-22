@@ -33,10 +33,12 @@ extend( google.mapsextensions.MarkersCollection.prototype, {
 	},
 	
 	setEditable: function( editable ) {
-		for( var index = 0, marker; marker = this.getAt( index ); ++index ) {
-			marker.setDraggable( !!editable );
-			marker.setVisible( !!editable );
-		}
+		var editable = !!editable;
+		
+		this.forEach( function( marker, index ) {
+			marker.setDraggable( editable );
+			marker.setVisible( editable );
+		} );
 	}
 } );
 

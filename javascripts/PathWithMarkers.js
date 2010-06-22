@@ -14,6 +14,11 @@
 * @config map
 * @type {object} (optional)
 */
+/**
+* The color of the markers, of the style you would use for CSS.
+* @config color
+* @type {string}
+*/
 google.mapsextensions.PathWithMarkers = function( opts ) {
 	extend(this, opts);
 	
@@ -54,8 +59,7 @@ extend( google.mapsextensions.PathWithMarkers.prototype, {
 		var marker = new google.mapsextensions.PointMarker( {
 			position: latLng,
 			map: this.map,
-			color: '#ff0000',
-			/*path: this.path,*/
+			color: this.color || '#000000',
 			visible: !!this.editingEnabled,
 			draggable: !!this.editingEnabled
 		} );
@@ -77,7 +81,6 @@ extend( google.mapsextensions.PathWithMarkers.prototype, {
 		if( index == 0 && len > 1 ) {
 			this.insertAt( len, marker.getPosition() );
 			google.maps.event.trigger( this, 'endline' );
-		//	this.setEditable( false );
 		}
 	},
 	
@@ -98,6 +101,20 @@ extend( google.mapsextensions.PathWithMarkers.prototype, {
 	*/
 	setMap: function( map ) {
 		this.map = map;
+	},
+	
+	/**
+	* Set the options
+	* @method setOptions
+	* @param {object} opts - options to set
+	*/
+	setOptions: function( opts ) {
+		if( opts.color ) {
+			this.color = opts.color;
+			this.markerCollection.forEach( function( marker, index ) {
+				marker.setColor( opts.color );
+			} );
+		}
 	},
 	
 	/**

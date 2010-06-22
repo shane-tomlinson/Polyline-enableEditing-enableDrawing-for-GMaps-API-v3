@@ -15,6 +15,6 @@ Example of how to use this can be found in html/test.html.
 Online demo can be found at: http://www.shanetomlinson.com/static/gmapV3EditablePolys/html/test.html
 
 TODO:
-* Fix up the Drag/Drop of markers
-* colors/transparency of markers
+* Fix up the Drag/Drop of markers to make more reliable
 * remove marker dependency on jQuery
+* Make markers only appear when enableEditing is called and when mousing over the Polyline
