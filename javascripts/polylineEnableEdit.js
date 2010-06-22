@@ -331,9 +331,11 @@ __extend( google.mapsextensions.MarkersCollection.prototype, {
 	},
 	
 	setEditable: function( editable ) {
-		for( var index = 0, marker; marker = this.getAt( index ); ++index ) {
-			marker.setDraggable( !!editable );
-		}
+		var editable = !!editable;
+		
+		this.forEach( function( marker, index ) {
+			marker.setDraggable( editable );
+		} );
 	}
 } );
 
@@ -550,6 +552,14 @@ __extend( google.mapsextensions.PointMarker.prototype, {
 		this.target.css( {
 			borderColor: color
 		} );
+	},
+	
+	show: function() {
+		this.target.show();
+	},
+	
+	hide: function() {
+		this.target.hide();
 	}
 	
 } );
