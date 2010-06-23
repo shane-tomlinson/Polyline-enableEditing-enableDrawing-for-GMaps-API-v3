@@ -21,9 +21,10 @@ google.mapsextensions.Polyline.prototype = new google.maps.Polyline();
 
 extend( google.mapsextensions.Polyline.prototype, {
 	enableDrawing: function( opts ) {
-		this.setPolyEditOptions( opts );
+		this.enableEditing( opts );
 		
 		this.mapClickHandler = google.maps.event.addListener( this.getMap(), 'click', bind( this.onMapClick, this ) );
+		this.mapMouseMoveHandler = google.maps.event.addListener( this.getMap(), 'mousemove', bind( this.onMapMouseMove, this ) );
 	},
 	
 	enableEditing: function( opts ) {
@@ -70,6 +71,10 @@ extend( google.mapsextensions.Polyline.prototype, {
 		}
 		
 		this.addPointFromPolyline = false;
+	},
+	
+	onMapMouseMove: function( event ) {
+	
 	},
 	
 	onLineUpdated: function( event ) {
