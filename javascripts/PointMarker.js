@@ -21,7 +21,6 @@ extend( google.mapsextensions.PointMarker.prototype, {
 		this.target = $( div );
 		this.target.css( {
 			border: '1px solid ' + this.color,
-			display: this.visible ? 'block' : 'none',
 			position: 'absolute',
 			'background-color': '#ffffff',
 			'width': '9px',
@@ -124,7 +123,7 @@ extend( google.mapsextensions.PointMarker.prototype, {
 	
 	setVisible: function( visible ) {
 		this.visible = !!visible;
-		this.target[visible ? "show" : "hide"]();
+		this.target[ visible ? "show" : "hide" ]();
 	},
 	
 	getPosition: function() {
