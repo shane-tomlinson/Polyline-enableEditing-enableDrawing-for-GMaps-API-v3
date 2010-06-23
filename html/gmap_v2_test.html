@@ -1,0 +1,96 @@
+<html>
+<head>
+	<title>Polyline enableDrawing/enableEditing with Google Maps API v2 test</title>
+	<script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+	<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&key=ABQIAAAAKtjqjJV86ZXK8kyXTHYe3RRQz_nxo7Cwi4wB_D1LUUVXj8dd7RSC_78s3mlZh4E3bzC9W14UIUteTA" type="text/javascript"></script	
+</head>
+
+<body>
+	<div style="float:left"><div id="map_canvas"></div></div>
+	<div style="float: left; width: 500px;">
+		<ol>
+			<li>To start adding points, click Enable Drawing</li>
+			<li>To add new points to the line or to move points, click Enable Editing</li>
+			<li>To disable both modification of the line and points, click Disable Editing</li>
+			<li>To drag a marker, mouse over the marker, press the mouse button down, move the mouse around, let go of the button.</li>
+			<li>To change the color of the lines/markers, enter the hex value of the color of the form "#abcdef" into the input box and press the Change Color button.</li>
+		</ol>
+		<a href="#" id="btnEnableDrawing">Enable Drawing</a>
+		<a href="#" id="btnEnableEditing">Enable Editing</a>
+		<a href="#" id="btnDisableEditing">Disable Editing</a>
+
+		<div style="margin-top: 10px; padding: 10px;">
+			<label for="color">Color:<label><input type="text" id="color" value="#0000ff"/>
+			<a href="#" id="btnSetColor">Change Color</a>
+		</div>
+		
+		<a href="test.html">Compare with the our homegrown replacement for GMap v3 API</a>
+	</div>
+	
+	<script type="text/javascript">
+		  var initialColor = '#0000ff';
+		  var poly;
+		  var map;
+
+		  function initialize() {
+			var myOptions = {
+			  size: new GSize( 400, 300 )
+			};
+
+			map = new GMap2(document.getElementById('map_canvas'), myOptions);
+			var chicago = new GLatLng(41.879535, -87.624333);
+			map.setCenter( chicago );
+			map.setZoom( 7 );
+			
+			poly = new GPolyline( [], initialColor, 3, 0.6, {
+				clickable: true,
+				geodesic: false
+			} );
+			map.addOverlay( poly );
+			
+		  }
+
+		  initialize();
+	
+		$( '#btnEnableEditing' ).bind( 'click', function( event ) {
+			event.preventDefault();
+			
+			poly.enableEditing();
+		} );
+
+		$( '#btnEnableDrawing' ).bind( 'click', function( event ) {
+			event.preventDefault();
+			
+			poly.enableDrawing();
+		} );
+
+		$( '#btnDisableEditing' ).bind( 'click', function( event ) {
+			event.preventDefault();
+
+			poly.disableEditing();
+		} );
+		
+		$( '#color' ).val( initialColor );
+		$( '#btnSetColor' ).bind( 'click', function( event ) {
+			event.preventDefault();
+			
+			poly.setStrokeStyle( {
+				color: $( '#color' ).val()
+			} );
+		} );
+	</script>
+	<script type="text/javascript">
+		if( document.location.host.search( 'shanetomlinson' ) > -1 ) {
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		}
+	</script>
+	<script type="text/javascript">
+		try {
+			var pageTracker = _gat._getTracker("UA-9481964-1");
+			// Cookied already:
+			pageTracker._trackPageview();
+		} catch(err) {}
+599</script> 
+</body>
+</html>
