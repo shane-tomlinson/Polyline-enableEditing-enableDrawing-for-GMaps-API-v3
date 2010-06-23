@@ -7,7 +7,8 @@
 */
 google.mapsextensions.Polyline = function( opts ) {
 	this.color = opts.strokeColor;
-
+	this.opts = opts;
+	
 	this.drawingOpts = { 
 		fromStart: false,
 		maxVerticies: Infinity
@@ -25,6 +26,8 @@ extend( google.mapsextensions.Polyline.prototype, {
 		
 		this.mapClickHandler = google.maps.event.addListener( this.getMap(), 'click', bind( this.onMapClick, this ) );
 		this.mapMouseMoveHandler = google.maps.event.addListener( this.getMap(), 'mousemove', bind( this.onMapMouseMove, this ) );
+		
+		this.showDrawingLine();
 	},
 	
 	enableEditing: function( opts ) {
@@ -51,6 +54,12 @@ extend( google.mapsextensions.Polyline.prototype, {
 			this.mapClickHandler = null;
 		}
 		
+		if( this.mapMouseMoveHandler ) {
+			google.maps.event.removeListener( this.mapMouseMoveHandler );
+			this.mapMouseMoveHandler = null;
+		}
+		
+		this.hideDrawingLine();
 	},
 
 	onPolylineMouseDown: function( event ) {
@@ -74,7 +83,7 @@ extend( google.mapsextensions.Polyline.prototype, {
 	},
 	
 	onMapMouseMove: function( event ) {
-	
+		this.updateDrawingLine( this.lastLatLng, event.latLng );
 	},
 	
 	onLineUpdated: function( event ) {
@@ -86,6 +95,7 @@ extend( google.mapsextensions.Polyline.prototype, {
 		if( path.length < this.drawingOpts.maxVerticies ) {
 			this.pathWithMarkers.insertAt( index, latLng );
 		}
+		this.lastLatLng = latLng;
 	},
 
 	initPathWithMarkers: function() {
@@ -121,6 +131,31 @@ extend( google.mapsextensions.Polyline.prototype, {
 		}
 		
 		google.maps.Polyline.prototype.setOptions.apply( this, arguments );
+	},
+	
+	/**
+	* TODO - move this drawing line into its own class
+	*/
+	showDrawingLine: function() {
+		if( !this.drawingLine ) {
+			var options = extend( {}, this.opts );
+			options = extend( options, {
+				clickable: false
+			} );
+			this.drawingLine = new google.maps.Polyline( options );
+		}
+		this.drawingLine.setMap( this.getMap() );
+		this.drawingLine.setPath( [] );
+	},
+	
+	hideDrawingLine: function() {
+		this.drawingLine.setMap( null );
+	},
+	
+	updateDrawingLine: function( startPoint, endPoint ) {
+		if( startPoint && endPoint ) {
+			this.drawingLine.setPath( [ startPoint, endPoint ] );
+		}
 	}
 	
 } );

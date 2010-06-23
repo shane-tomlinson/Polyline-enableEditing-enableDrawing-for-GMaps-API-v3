@@ -10,6 +10,7 @@ function extend(addTo, extension) {
 	for( var key in extension ) {
 		addTo[ key ] = extension[ key ];
 	}
+	return addTo;
 }
 
 function bind( func, context ) {
