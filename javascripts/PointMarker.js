@@ -36,7 +36,9 @@ extend( google.mapsextensions.PointMarker.prototype, {
 		this.target.bind( 'mousedown', bind( this.onMouseDown, this ) )
 				.bind( 'mouseup', bind( this.onMouseUp, this ) )
 				.bind( 'mousemove', bind( this.onMouseMove, this ) )
-				.bind( 'click', bind( this.onClick, this ) );
+				.bind( 'click', bind( this.onClick, this ) )
+				.bind( 'mouseover', bind( this.onMouseOver, this ) )
+				.bind( 'mouseout', bind( this.onMouseOut, this ) );
 	},
 	
 	draw: function() {
@@ -93,6 +95,25 @@ extend( google.mapsextensions.PointMarker.prototype, {
 		google.maps.event.trigger( this, 'click', latLng );
 	},
 
+	onMouseOver: function( event ) {
+		if ( !this.hoverColor || !this.hoverColor[this.color] ) {
+            this.hoverColor = {};
+            this.hoverColor[this.color] = this.createHoverColor( this.color );
+		}
+		this.target.css( { background: this.hoverColor[this.color] } );
+	},
+	
+	createHoverColor: function( color ) {
+		var rgb = new google.mapsextensions.RgbColor( color );
+		var hsl = rgb.toHsl();
+		hsl.lighten();
+		return hsl.toRgb().toString();
+	},
+	
+	onMouseOut: function( event ) {
+		this.target.css( { background: "white" } );
+	},
+	
 	onMouseUpOverMap: function( event ) {
 		if( this.draggable && this.dragging ) {
 			var latLng = this.getEventLatLng( event );
@@ -116,7 +137,6 @@ extend( google.mapsextensions.PointMarker.prototype, {
 			google.maps.event.trigger( this, 'drag', latLng );
 		}
 	},
-	
 	
 	setDraggable: function( draggable ) {
 		this.draggable = !!draggable;
@@ -167,6 +187,7 @@ extend( google.mapsextensions.PointMarker.prototype, {
 	* @param {string} color - new marker color
 	*/
 	setColor: function( color ) {
+		this.color = color;
 		this.target.css( {
 			borderColor: color
 		} );
