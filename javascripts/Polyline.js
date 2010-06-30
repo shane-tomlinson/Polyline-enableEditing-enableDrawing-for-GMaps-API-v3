@@ -73,8 +73,7 @@ extend( google.mapsextensions.Polyline.prototype, {
 	
 	onMapClick: function( event ) {
 		if( !this.addPointFromPolyline ) {
-			var path = this.getPath();
-			var index = this.drawingOpts.fromStart ? 0 : path.length;
+			var index = this.getNewLatLngIndex();
 			this.addPoint( event.latLng, index );
 		}
 		
@@ -94,6 +93,11 @@ extend( google.mapsextensions.Polyline.prototype, {
 		this.disableEditing();
 	},
 	
+	onStartMarkerClick: function( marker ) {
+		var index = this.getNewLatLngIndex();
+		this.addPoint( marker.getPosition(), index );
+	},
+	
 	addPoint: function( latLng, index ) {
 		var path = this.getPath();
 		if( path.length < this.drawingOpts.maxVerticies ) {
@@ -110,6 +114,7 @@ extend( google.mapsextensions.Polyline.prototype, {
 		} );
 		google.maps.event.addListener( this.pathWithMarkers, 'lineupdated', bind( this.onLineUpdated, this ) );
 		google.maps.event.addListener( this.pathWithMarkers, 'endline', bind( this.onEndLine, this ) );
+		google.maps.event.addListener( this.pathWithMarkers, 'startmarkerclick', bind( this.onStartMarkerClick, this ) );
 	},
 	
 	setPolylineEditable: function( editable ) {
@@ -161,6 +166,11 @@ extend( google.mapsextensions.Polyline.prototype, {
 			
 			this.drawingLine = new DrawingLine( opts );
 		}	
+	},
+	
+	getNewLatLngIndex: function() {
+		var index = this.drawingOpts.fromStart ? 0 : this.getPath().length;
+		return index;
 	}
 	
 	
