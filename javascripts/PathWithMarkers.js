@@ -80,7 +80,10 @@ extend( google.mapsextensions.PathWithMarkers.prototype, {
 		var len = this.path.getLength();
 		if( index == 0 && len > 1 ) {
 			this.insertAt( len, marker.getPosition() );
-			google.maps.event.trigger( this, 'endline' );
+			// should do this after a small timeout so the last point has a chance to actually be added to the map.
+			setTimeout( bind( function() {
+				google.maps.event.trigger( this, 'endline' );
+			}, this ), 0 );
 		}
 	},
 	

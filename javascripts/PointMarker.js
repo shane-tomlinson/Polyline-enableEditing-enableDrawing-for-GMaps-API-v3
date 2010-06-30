@@ -144,7 +144,9 @@ extend( google.mapsextensions.PointMarker.prototype, {
 	
 	setVisible: function( visible ) {
 		this.visible = !!visible;
-		this.target[ visible ? "show" : "hide" ]();
+		if( this.target ) {
+			this.target[ visible ? "show" : "hide" ]();
+		}
 	},
 	
 	getPosition: function() {
