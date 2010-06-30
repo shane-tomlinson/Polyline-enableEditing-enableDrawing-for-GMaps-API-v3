@@ -138,30 +138,32 @@ extend( google.mapsextensions.Polyline.prototype, {
 		google.maps.Polyline.prototype.setOptions.apply( this, arguments );
 	},
 	
-	/**
-	* TODO - move this drawing line into its own class
-	*/
 	showDrawingLine: function() {
-		if( !this.drawingLine ) {
-			var options = extend( {}, this.opts );
-			options = extend( options, {
-				clickable: false
-			} );
-			this.drawingLine = new google.maps.Polyline( options );
-		}
-		this.drawingLine.setMap( this.getMap() );
-		this.drawingLine.setPath( [] );
+		this.createDrawingLine();
+		this.drawingLine.show();
 	},
 	
 	hideDrawingLine: function() {
-		this.drawingLine.setMap( null );
+		this.drawingLine.hide();
 	},
 	
 	updateDrawingLine: function( startPoint, endPoint ) {
 		if( startPoint && endPoint ) {
-			this.drawingLine.setPath( [ startPoint, endPoint ] );
+			this.drawingLine.updatePoints( startPoint, endPoint );
 		}
+	},
+	
+	createDrawingLine: function() {
+		if( !this.drawingLine ) {
+			var opts = extend( {
+				map: this.getMap()
+			}, this.opts );
+			
+			this.drawingLine = new DrawingLine( opts );
+		}	
 	}
+	
+	
 	
 } );
 
