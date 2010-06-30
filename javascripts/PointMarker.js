@@ -47,18 +47,22 @@ extend( google.mapsextensions.PointMarker.prototype, {
 	
 	setPosition: function( latLng ) {
 		this.position = latLng;
-		var overlayProjection = this.getProjection();
-		var centerPos = overlayProjection.fromLatLngToDivPixel( latLng );
-		
-		this.target.css( {
-			left: ( centerPos.x - 5 ) + 'px',
-			top: ( centerPos.y - 5 ) + 'px'
-		} );
+		if( this.target ) {
+			var overlayProjection = this.getProjection();
+			var centerPos = overlayProjection.fromLatLngToDivPixel( latLng );
+
+			this.target.css( {
+				left: ( centerPos.x - 5 ) + 'px',
+				top: ( centerPos.y - 5 ) + 'px'
+			} );
+		}
 	},
 	
 	onRemove: function() {
-		this.target.remove();
-		this.target = null;
+		if( this.target ) {
+			this.target.remove();
+			this.target = null;
+		}
 	},
 	
 	onMouseDown: function( event ) {
@@ -190,9 +194,11 @@ extend( google.mapsextensions.PointMarker.prototype, {
 	*/
 	setColor: function( color ) {
 		this.color = color;
-		this.target.css( {
-			borderColor: color
-		} );
+		if( this.target ) {
+			this.target.css( {
+				borderColor: color
+			} );
+		}
 	}
 	
 } );
