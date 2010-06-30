@@ -40,7 +40,6 @@ extend( google.mapsextensions.Polyline.prototype, {
 	},
 
 	disableEditing: function() {
-		this.editingEnabled = false;
 		this.pathWithMarkers.setEditable( false );
 		this.setPolylineEditable( false );
 		
@@ -90,6 +89,11 @@ extend( google.mapsextensions.Polyline.prototype, {
 		google.maps.event.trigger( this, 'lineupdated' );
 	},
 	
+	onEndLine: function( event ) {
+		google.maps.event.trigger( this, 'endline' );
+		this.disableEditing();
+	},
+	
 	addPoint: function( latLng, index ) {
 		var path = this.getPath();
 		if( path.length < this.drawingOpts.maxVerticies ) {
@@ -105,6 +109,7 @@ extend( google.mapsextensions.Polyline.prototype, {
 			color: this.color
 		} );
 		google.maps.event.addListener( this.pathWithMarkers, 'lineupdated', bind( this.onLineUpdated, this ) );
+		google.maps.event.addListener( this.pathWithMarkers, 'endline', bind( this.onEndLine, this ) );
 	},
 	
 	setPolylineEditable: function( editable ) {
@@ -120,7 +125,7 @@ extend( google.mapsextensions.Polyline.prototype, {
 	},
 	
 	setPolyEditOptions: function( opts ) {
-		extend(this.drawingOpts, opts || {});
+		extend( this.drawingOpts, opts || {} );
 	},
 	
 	setOptions: function( opts ) {
