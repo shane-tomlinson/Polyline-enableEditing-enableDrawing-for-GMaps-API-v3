@@ -16,7 +16,7 @@
 */
 google.mapsextensions.Segment = function( opts ) {
 	extend(this, opts);
-}
+};
 
 extend( google.mapsextensions.Segment.prototype, {
 	/**
@@ -38,5 +38,5 @@ extend( google.mapsextensions.Segment.prototype, {
 				
 		return ( ( ( bearingToEnd - 2 ) < bearingToPoint ) && ( bearingToPoint <  ( bearingToEnd + 2 ) ) && ( distanceToPoint <= distanceToEnd ) );
 	}
-} )
+} );
 
