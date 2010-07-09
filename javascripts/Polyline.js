@@ -61,12 +61,13 @@ extend( google.mapsextensions.Polyline.prototype, {
 		this.hideDrawingLine();
 	},
 
-	onPolylineMouseDown: function( event ) {
+	onPolylineMouseDown: function( event ) {	
 		var latLng = event.latLng;
 		var segment = this.pathWithMarkers.getIndexOfSegmentContainingPoint( latLng );
 		if( segment > -1 ) {
 			var index = segment + 1;	// if we are adding to segment 0, then the added point is point 1.
 			this.addPoint( latLng, index );
+			this.dragPoint( index );
 			this.addPointFromPolyline = true;
 		}
 	},
@@ -80,6 +81,17 @@ extend( google.mapsextensions.Polyline.prototype, {
 		this.addPointFromPolyline = false;
 	},
 	
+	onMapDoubleClick: function( event ) {
+		if( !this.addPointFromPolyline ) {
+			var index = this.getNewLatLngIndex();
+			this.addPoint( event.latLng, index );
+			google.maps.event.trigger( this, 'cancelline' );
+			this.disableEditing();
+		}
+		
+		this.addPointFromPolyline = false;
+	},
+	
 	onMapMouseMove: function( event ) {
 		this.updateDrawingLine( this.lastLatLng, event.latLng );
 	},
@@ -88,14 +100,12 @@ extend( google.mapsextensions.Polyline.prototype, {
 		google.maps.event.trigger( this, 'lineupdated' );
 	},
 	
-	onEndLine: function( event ) {
+	onEndLine: function( latLng ) {
+		var index = this.getNewLatLngIndex();
+		this.addPoint( latLng, index );
+		
 		google.maps.event.trigger( this, 'endline' );
 		this.disableEditing();
-	},
-	
-	onStartMarkerClick: function( marker ) {
-		var index = this.getNewLatLngIndex();
-		this.addPoint( marker.getPosition(), index );
 	},
 	
 	addPoint: function( latLng, index ) {
@@ -104,6 +114,10 @@ extend( google.mapsextensions.Polyline.prototype, {
 			this.pathWithMarkers.insertAt( index, latLng );
 		}
 		this.lastLatLng = latLng;
+	},
+	
+	dragPoint: function( index ) {
+		this.pathWithMarkers.dragMarker( index );
 	},
 
 	initPathWithMarkers: function() {
@@ -114,7 +128,6 @@ extend( google.mapsextensions.Polyline.prototype, {
 		} );
 		google.maps.event.addListener( this.pathWithMarkers, 'lineupdated', bind( this.onLineUpdated, this ) );
 		google.maps.event.addListener( this.pathWithMarkers, 'endline', bind( this.onEndLine, this ) );
-		google.maps.event.addListener( this.pathWithMarkers, 'startmarkerclick', bind( this.onStartMarkerClick, this ) );
 	},
 	
 	setPolylineEditable: function( editable ) {

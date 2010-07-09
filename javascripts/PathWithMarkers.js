@@ -44,17 +44,25 @@ extend( google.mapsextensions.PathWithMarkers.prototype, {
 		var marker = this.createMarker( index, latLng );
 		this.markerCollection.addMarker( marker, index );
 
-		google.maps.event.addListener( marker, 'dragend', bind( function( latLng ) {
-			this.onMarkerDragEnd( marker );
+		google.maps.event.addListener( marker, 'drag', bind( function( latLng ) {
+			this.onMarkerDrag( marker );
 		}, this ) );
-		
+
 		google.maps.event.addListener( marker, 'click', bind( function( latLng ) {
 			this.onMarkerClick( marker );
 		}, this ) );
-		
+				
 		google.maps.event.trigger( this, 'lineupdated' );
 	},
 	
+	/**
+	* A marker factory method
+	* @method createMarker
+	* @param {number} index - index on path where to place marker
+	* @param {object} latLng - latitude and longitude to place the marker
+	* @return {object} a google.mapsextensions.PointMarker
+	* @private
+	*/
 	createMarker: function( index, latLng ) {
 		var marker = new google.mapsextensions.PointMarker( {
 			position: latLng,
@@ -67,24 +75,31 @@ extend( google.mapsextensions.PathWithMarkers.prototype, {
 		return marker;
 	},
 	
-	onMarkerDragEnd: function( marker ) {
+	/**
+	* initiate the dragging of a marker
+	* @method dragMarker
+	* @param {number} index of marker to start dragging
+	*/
+	dragMarker: function( index ) {
+		var marker = this.markerCollection.getAt( index );
+		if( marker ) {
+			marker.setDraggable( true );
+			marker.startDrag();
+		}
+	},
+		
+	onMarkerDrag: function( marker ) {
 		var index = this.markerCollection.getIndex( marker );
 		if( index > -1 ) {
 			this.path.setAt( index, marker.getPosition() );
-			google.maps.event.trigger( this, 'lineupdated' );
 		}
 	},
-	
+
 	onMarkerClick: function( marker ) {
 		var index = this.markerCollection.getIndex( marker );
 		var len = this.path.getLength();
-		if( index == 0 && len > 1 ) {
-			// TODO - Not sure if this is the best way to go about doing this.  The Polyline is listening for a 'markerclick'
-			google.maps.event.trigger( this, 'startmarkerclick', marker );
-			// should do this after a small timeout so the last point has a chance to actually be added to the map.
-			setTimeout( bind( function() {
-				google.maps.event.trigger( this, 'endline' );
-			}, this ), 0 );
+		if( index === 0 && len > 1 ) {
+			google.maps.event.trigger( this, 'endline', marker.getPosition() );
 		}
 	},
 	
@@ -127,7 +142,7 @@ extend( google.mapsextensions.PathWithMarkers.prototype, {
 	*	the segment between points 1 and 2.
 	* @method getSegment
 	* @param {number} index - index of the segment to get
-	* @returns {object} segment if available, undefined otw.
+	* @return {object} segment if available, undefined otw.
 	*/
 	getSegment: function( index ) {
 		var startPoint = this.path.getAt( index );
@@ -148,7 +163,7 @@ extend( google.mapsextensions.PathWithMarkers.prototype, {
 	* gets the index of the segment containing the specified point.
 	* @method getIndexOfSegmentContainingPoint
 	* @param {LatLng} latLng - latLng to search for
-	* @returns {number} index of segment if available, -1 otherwise.
+	* @return {number} index of segment if available, -1 otherwise.
 	*/
 	getIndexOfSegmentContainingPoint: function( latLng ) {
 		for( var index = 0, segment; segment = this.getSegment( index ); ++index ) {

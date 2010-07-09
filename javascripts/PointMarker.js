@@ -1,5 +1,6 @@
 /**
 * An marker marking a point on the map
+*
 * @class google.mapsextensions.PointMarker
 * @extends google.maps.OverlayView
 * @constructor 
@@ -11,8 +12,10 @@ google.mapsextensions.PointMarker = function( opts ) {
 	this.target = null;
 	
 	this.setMap( this.map );
-}
+};
 google.mapsextensions.PointMarker.prototype = new google.maps.OverlayView();
+
+google.mapsextensions.PointMarker.hoverFillColorCache = {};
 
 extend( google.mapsextensions.PointMarker.prototype, {
 	onAdd: function() {
@@ -45,6 +48,11 @@ extend( google.mapsextensions.PointMarker.prototype, {
 		this.setPosition( this.position );
 	},
 	
+	/**
+	* Set the position of the marker
+	* @method setPosition
+	* @param {object} latLng - where to place the marker
+	*/
 	setPosition: function( latLng ) {
 		this.position = latLng;
 		if( this.target ) {
@@ -71,17 +79,7 @@ extend( google.mapsextensions.PointMarker.prototype, {
 		var latLng = this.getEventLatLng( event );
 		google.maps.event.trigger( this, 'mousedown', latLng );	
 		
-		if( this.draggable ) {
-			google.maps.event.trigger( this, 'dragstart', latLng );	
-			
-			this.mouseMoveOverMapListner = bind( this.onMouseMoveOverMap, this );
-			$( this.getMap().getDiv() ).bind( 'mousemove', this.mouseMoveOverMapListner );
-			
-			this.mouseUpOverMapListner = bind( this.onMouseUpOverMap, this );
-			$( this.getMap().getDiv() ).bind( 'mouseup', this.mouseUpOverMapListner );
-
-			this.dragging = true;
-		}
+		this.startDrag();
 	},
 	
 	onMouseUp: function( event ) {
@@ -100,27 +98,60 @@ extend( google.mapsextensions.PointMarker.prototype, {
 	},
 
 	onMouseOver: function( event ) {
-		if ( !this.hoverColor || !this.hoverColor[this.color] ) {
-            this.hoverColor = {};
-            this.hoverColor[this.color] = this.createHoverColor( this.color );
-		}
-		this.target.css( { background: this.hoverColor[this.color] } );
-	},
-	
-	createHoverColor: function( color ) {
-		var rgb = new google.mapsextensions.RgbColor( color );
-		var hsl = rgb.toHsl();
-		hsl.lighten();
-		return hsl.toRgb().toString();
+		this.setFillColorHover();
 	},
 	
 	onMouseOut: function( event ) {
-		this.target.css( { background: "white" } );
+		this.setFillColorDefault();
 	},
 	
 	onMouseUpOverMap: function( event ) {
+		this.stopDrag();
+	},
+	
+	onMouseMoveOverMap: function( event ) {
 		if( this.draggable && this.dragging ) {
 			var latLng = this.getEventLatLng( event );
+
+			this.setPosition( latLng );
+			google.maps.event.trigger( this, 'drag', latLng );
+		}
+	},
+	
+	/**
+	* Start dragging the marker
+	* @method startDrag
+	*/
+	startDrag: function() {
+		if( this.draggable ) {
+			this.getMap().setOptions( {
+				draggable: false
+			} );
+		
+			var latLng = this.getPosition();
+			google.maps.event.trigger( this, 'dragstart', latLng );	
+			
+			this.mouseMoveOverMapListner = bind( this.onMouseMoveOverMap, this );
+			$( this.getMap().getDiv() ).bind( 'mousemove', this.mouseMoveOverMapListner );
+			
+			this.mouseUpOverMapListner = bind( this.onMouseUpOverMap, this );
+			$( this.getMap().getDiv() ).bind( 'mouseup', this.mouseUpOverMapListner );
+
+			this.dragging = true;
+		}
+	},
+
+	/**
+	* Stop dragging the marker
+	* @method stopDrag
+	*/
+	stopDrag: function() {
+		if( this.draggable && this.dragging ) {
+			this.getMap().setOptions( {
+				draggable: true
+			} );
+			
+			var latLng = this.getPosition();
 			google.maps.event.trigger( this, 'dragend', latLng );
 			
 			$( this.getMap().getDiv() ).unbind( 'mousemove', this.mouseMoveOverMapListner );
@@ -133,19 +164,25 @@ extend( google.mapsextensions.PointMarker.prototype, {
 		}
 	},
 	
-	onMouseMoveOverMap: function( event ) {
-		if( this.draggable && this.dragging ) {
-			var latLng = this.getEventLatLng( event );
-
-			this.setPosition( latLng );
-			google.maps.event.trigger( this, 'drag', latLng );
+	/**
+	* Sets the marker draggable
+	* @method setDraggable
+	* @param {boolean} draggable - whether the marker is draggable or not
+	*/
+	setDraggable: function( draggable ) {
+		draggable = !!draggable;
+		
+		if( this.draggable != draggable ) {
+			this.draggable = !!draggable;
+			google.maps.event.trigger( this, 'draggable_changed' );
 		}
 	},
 	
-	setDraggable: function( draggable ) {
-		this.draggable = !!draggable;
-	},
-	
+	/**
+	* Set whether the marker is visible
+	* @method setVisible
+	* @param {boolean} visible - whether the marker is visible or not
+	*/
 	setVisible: function( visible ) {
 		this.visible = !!visible;
 		if( this.target ) {
@@ -153,10 +190,22 @@ extend( google.mapsextensions.PointMarker.prototype, {
 		}
 	},
 	
+	/**
+	* Get the markers latLng
+	* @method getPosition
+	* @return {object} latLng
+	*/
 	getPosition: function() {
 		return this.position;
 	},
 	
+	/**
+	* get the latLng of the event
+	* @method getEventLatLng
+	* @param {object} event - the DOM to get latLng for
+	* @return {object} latLng of event
+	* @private
+	*/
 	getEventLatLng: function( event ) {
 		var eventPoint = this.getEventPoint( event );
 		
@@ -165,6 +214,13 @@ extend( google.mapsextensions.PointMarker.prototype, {
 		return latLng;
 	},
 	
+	/**
+	* Get the x/y point of the event
+	* @method getEventPoint
+	* @param {object} event - the event to get the point for
+	* @return {object} google.maps.Point
+	* @private
+	*/
 	getEventPoint: function( event ) {
 		var mapDiv = this.getMap().getDiv();
 		var offset = $( mapDiv ).offset();
@@ -199,7 +255,40 @@ extend( google.mapsextensions.PointMarker.prototype, {
 				borderColor: color
 			} );
 		}
-	}
+	},
 	
+	/**
+	* update the fill color with the default
+	* @method setFillColorDefault
+	*/
+	setFillColorDefault: function() {
+		this.target.css( { background: "#fff" } );
+	},
+	
+	/**
+	* update the hover fill color
+	* @method setFillColorHover
+	*/
+	setFillColorHover: function() {
+		var color = this.color;
+		if( !google.mapsextensions.PointMarker.hoverFillColorCache[ color ] ) {
+		   google.mapsextensions.PointMarker.hoverFillColorCache[ color ] = this.getHoverColor( color );
+		}
+
+		this.target.css( { background: google.mapsextensions.PointMarker.hoverFillColorCache[ color ] } );
+	},
+	
+	/**
+	* gets the color of the marker for when the user hovers over the marker
+	* @method getHoverColor
+	* @param {object} color - the color of the line
+	* @return {string} color to use for the marker.
+	*/
+	getHoverColor: function( color ) {
+		var rgb = new google.mapsextensions.RgbColor( color );
+		var hsl = rgb.toHsl();
+		hsl.lighten();
+		return hsl.toRgb().toString();
+	}
 } );
 
